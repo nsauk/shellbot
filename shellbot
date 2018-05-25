@@ -1,0 +1,80 @@
+#!/bin/bash
+
+if [[ -v DEBUG ]]; then
+  R='\033[0;31m'; G='\033[0;32m';
+  D='\033[0;36m'; Y='\033[0;33m';
+  B='\033[0;34m'; W='\033[0;97m';
+  H='\033[0;30m'; N='\033[0m';
+  OUT=/dev/stdout
+else
+  OUT=shellbot.log
+fi
+
+_log() {
+  color=$(case $1 in
+    (ok) echo ${G};;
+    (log) echo ${W};;
+    (info) echo ${B};;
+    (wait|warn) echo ${Y};;
+    (error) echo ${R};;
+  esac)
+  echo -e $(date +%F_%T) $color$2${N} >> $OUT
+}
+
+if [ -f shellbot.conf ]; then
+  . shellbot.conf
+  if [[ -v TOKEN && -v API_URL && -v TIMEOUT ]]; then
+    _log ok "Initialized"
+  else
+    _log error "Invalid config file"; exit 11
+  fi
+else
+  _log error "Config file not found"; exit 10
+fi
+
+reply() {
+  shopt -s nocasematch
+  case $2 in
+    /start) send_message $1 "Try to send me some text.";;
+#    /help|help) send_message $1 "No. 😈";;
+    /ping|ping) send_message $1 "pong";;
+    *) reply=$($HANDLER $2 $3)
+       send_message $1 "$reply";;
+  esac
+}
+
+send_message() {
+  _log info "sendMessage:"
+  res=$(curl -s -X POST "$API_URL/sendMessage" --data "chat_id=$1&text=$2")
+  _log log "$res"
+}
+
+while true; do
+  sha256sum $0 > .hash
+  last=$(cat .last)
+  updates_call="curl -s \"$API_URL/getUpdates?timeout=$TIMEOUT&offset=$last\""
+  _log wait "Waiting for updates: $updates_call"
+  updates=$(eval $updates_call)
+  echo $updates | jq -r '.result[] | [
+  (.update_id | tostring),
+  if has("message") then (.message.from.id | tostring)
+    else (.edited_message.from.id | tostring) end,
+  if has("message") then .message.text
+    else .edited_message.text end] | @tsv' | \
+  while read message; do
+    #TODO rewrite this shit
+    data=(${message})
+    last=${data[0]}
+    echo $(( ++last )) > .last
+    peer=${data[1]}
+    arg1=${data[2]}
+    arg2=${data[3]}
+    reply $peer $arg1 $arg2
+  done
+  sleep 1
+  if [ "$(cat .hash)" != "$(sha256sum $0)" ]; then
+    _log warn "Code was changed, restart"
+    exec $0
+  fi
+done
+

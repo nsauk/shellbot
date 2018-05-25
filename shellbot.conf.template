@@ -1,0 +1,5 @@
+TOKEN=""
+API_URL="https://api.telegram.org/bot$TOKEN"
+TIMEOUT=30
+HANDLER=/path/to/script
+
