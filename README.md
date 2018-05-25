@@ -9,7 +9,7 @@ Please **DO NOT leave it runned** on any machine with the data you critically ne
 This script uses **curl** for requests and **jq** for JSON parsing. Also script calls **sha256sum** for check if code was changed (yeah, he online-development-ready™), and if your OS X don't have it yet, please install.
 
 ## How to use
-- Create bot via [@botfather](t.me/botfather) and copy his token
+- Create bot via [@botfather](https://t.me/botfather) and copy his token
 - Rename **shellbot.conf.template** to **shellbot.conf**
 - Insert to **shellbot.conf** your `TOKEN`
 - Add value to `HANDLER` (script or something other for create responses from users' requests, see below)
@@ -33,3 +33,4 @@ Bot response: 20380119
 
 ## License
 [MIT](LICENSE)
+
