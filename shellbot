@@ -51,6 +51,11 @@ send_message() {
 
 while true; do
   sha256sum $0 > .hash
+  if [ -f .last ]; then
+    last=$(cat .last)
+  else
+    last=0
+  fi
   last=$(cat .last)
   updates_call="curl -s \"$API_URL/getUpdates?timeout=$TIMEOUT&offset=$last\""
   _log wait "Waiting for updates: $updates_call"

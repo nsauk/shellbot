@@ -5,6 +5,9 @@ Looks like bot for Telegram (actually is sort of wrapper only)
 At the moment, this bot can contain absolutely any vulnerabilities, up to execution shell commands from messages.
 Please **DO NOT leave it runned** on any machine with the data you critically need.
 
+## Dependencies
+This script uses **curl** for requests and **jq** for JSON parsing. Also script calls **sha256sum** for check if code was changed (yeah, he online-development-ready™), and if your OS X don't have it yet, please install.
+
 ## How to use
 - Create bot via [@botfather](t.me/botfather) and copy his token
 - Rename **shellbot.conf.template** to **shellbot.conf**
@@ -19,7 +22,7 @@ export DEBUG=1
 - If everything is ok, stop bot, ```unset DEBUG``` and start bot in convenient way for you (maybe via *screen* or *crontab*)
 
 ## What is HANDLER
-Handler is a program which receive text from message (currently only [two first words](shellbot#L65)) as arguments and
+Handler is a program which receive text from message (currently only [two first words](shellbot#L70)) as arguments and
 return some result for sending to user.
 
 For example, if *date* will be used as `HANDLER`:
