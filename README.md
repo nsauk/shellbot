@@ -22,7 +22,7 @@ export DEBUG=1
 - If everything is ok, stop bot, ```unset DEBUG``` and start bot in convenient way for you (maybe via *screen* or *crontab*)
 
 ## What is HANDLER
-Handler is a program which receive text from message (currently only [two first words](shellbot#L70)) as arguments and
+Handler is a program which receive text from message as arguments and
 return some result for sending to user.
 
 For example, if *date* will be used as `HANDLER`:
