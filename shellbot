@@ -34,12 +34,14 @@ fi
 
 reply() {
   shopt -s nocasematch
-  case $2 in
-    /start) send_message $1 "Try to send me some text.";;
-#    /help|help) send_message $1 "No. 😈";;
-    /ping|ping) send_message $1 "pong";;
-    *) reply=$($HANDLER $2 $3)
-       send_message $1 "$reply";;
+  peer=$1; shift
+  cmd=$1; shift
+  case $cmd in
+    /start) send_message $peer "Try to send me some text.";;
+#    /help|help) send_message $peer "No. 😈";;
+    /ping|ping) send_message $peer "pong";;
+    *) reply=$($HANDLER $cmd $*)
+       send_message $peer "$reply";;
   esac
 }
 
@@ -67,14 +69,14 @@ while true; do
   if has("message") then .message.text
     else .edited_message.text end] | @tsv' | \
   while read message; do
-    #TODO rewrite this shit
     data=(${message})
     last=${data[0]}
     echo $(( ++last )) > .last
     peer=${data[1]}
-    arg1=${data[2]}
-    arg2=${data[3]}
-    reply $peer $arg1 $arg2
+    unset data[0] data[1]
+    args="${data[*]}"
+    echo $args
+    reply $peer $args
   done
   sleep 1
   if [ "$(cat .hash)" != "$(sha256sum $0)" ]; then
